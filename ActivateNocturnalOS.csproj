@@ -3,6 +3,7 @@
     <PropertyGroup>
         <TargetFramework>netstandard2.1</TargetFramework>
         <Nullable>enable</Nullable>
+        <LangVersion>Latest</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -11,6 +12,9 @@
       </Reference>
       <Reference Include="BepInEx">
         <HintPath>libs\Managed\BepInEx.dll</HintPath>
+      </Reference>
+      <Reference Include="Notiffy">
+        <HintPath>libs\Managed\Notiffy.dll</HintPath>
       </Reference>
       <Reference Include="PluginConfigurator">
         <HintPath>libs\Managed\PluginConfigurator.dll</HintPath>

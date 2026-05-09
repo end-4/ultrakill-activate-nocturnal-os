@@ -7,12 +7,12 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using PluginConfig.API;
-using PluginConfig.API.Fields;
-using PluginConfig.API.Decorators;
+using Notiffy.API;
+using System;
+using Notiffy.Utils;
 
 namespace ActivateNocturnalOS {
-    [BepInPlugin("com.github.end-4.activateNocturnalOS", "ActivateNocturnalOS", "1.0.0")]
+    [BepInPlugin("com.github.end-4.activateNocturnalOS", "ActivateNocturnalOS", "1.1.0")]
     public class Core : BaseUnityPlugin {
         // Logger
         internal static ManualLogSource? Log;
@@ -21,51 +21,46 @@ namespace ActivateNocturnalOS {
         public static string workingPath = Assembly.GetExecutingAssembly().Location;
         public static string workingDir = Path.GetDirectoryName(workingPath);
         public const string PluginGUID = "com.github.end-4.activateNocturnalOS";
-        public static PluginConfigurator? config = null;
-        public static BoolField? activated;
-        public static StringField? nagTitle;
-        public static StringField? nagBodyText;
-        public static FloatField? nagOpacity;
+        public const string PluginName = "ActivateNocturnalOS";
+        public const string PluginVersion = "1.1.0";
+
+        // Notifications
+        private float? lastNotification;
+        private static Notification[] notifs = [
+            new Notification {
+                Summary = "Backup to FourDrive",
+                Body = "Keep your files safe from attacks",
+                NotificationIcon = Img2Sprite.LoadNewSprite(Path.Combine(workingDir, "assets/fourdrive.png")),
+                Actions = ["yes", "Set up", "no", "Maybe later"],
+            },
+            new Notification {
+                Summary = "Get a genuine NocturnalOS license",
+                Body = "You may be a Fraud",
+                NotificationIcon = Img2Sprite.LoadNewSprite(Path.Combine(workingDir, "icon.png")),
+            },
+            new Notification {
+                Summary = "Try Smilesoft365",
+                Body = "Give your productivity a boost",
+                NotificationIcon = Img2Sprite.LoadNewSprite(Path.Combine(workingDir, "assets/smilesoft365.png")),
+                Actions = ["yes", "30 days free", "no", "I'll pass"],
+            },
+        ];
 
         // Nag stuff
-        private GameObject? nagCanvas;
-        private TMP_FontAsset? ukFont;
+        private static GameObject? nagCanvas;
+        private static TMP_FontAsset? ukFont;
 
         private void Awake() {
             Log = Logger;
 
-            CreateSettings();
+            ConfigManager.Initialize();
             SceneManager.sceneLoaded += OnSceneLoaded;
+            UserHints.Initialize();
 
             Log.LogInfo("ActivateNocturnalOS loaded!");
         }
 
-        private void CreateSettings() {
-            config = PluginConfigurator.Create("Nocturnal OS License", Core.PluginGUID);
-            string iconPath = Path.Combine(workingDir, "icon.png");
-            if (File.Exists(iconPath)) config.SetIconWithURL(iconPath);
-
-            new ConfigHeader(config.rootPanel, "-- ACTIVATION SETTINGS --", 24);
-            activated = new BoolField(config.rootPanel, "Activate Nocturnal OS", "activatedNocturnal", false);
-            nagTitle = new StringField(config.rootPanel, "Title text", "titleText", "Activate Nocturnal OS");
-            nagBodyText = new StringField(config.rootPanel, "Body text", "bodyText", "Go to Settings to activate Nocturnal OS");
-            nagOpacity = new FloatField(config.rootPanel, "Opacity", "nagOpacity", 0.35f, 0f, 1f);
-
-            activated.postValueChangeEvent += (bool b) => {
-                UpdateNagText();
-            };
-            nagTitle.postValueChangeEvent += (string s) => {
-                UpdateNagText();
-            };
-            nagBodyText.postValueChangeEvent += (string s) => {
-                UpdateNagText();
-            };
-            nagOpacity.postValueChangeEvent += (float f) => {
-                UpdateNagText();
-            };
-        }
-
-        private void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
+        private static void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
             if (ukFont == null) {
                 ukFont = Resources.FindObjectsOfTypeAll<TMP_FontAsset>()
                     .FirstOrDefault(f => f.name.Contains("VCR"));
@@ -74,7 +69,7 @@ namespace ActivateNocturnalOS {
             CreateLicenseNag();
         }
 
-        private void CreateLicenseNag() {
+        private static void CreateLicenseNag() {
             if (nagCanvas != null) return;
 
             nagCanvas = new GameObject("NocturnalOS_NagCanvas");
@@ -115,26 +110,26 @@ namespace ActivateNocturnalOS {
             UpdateNagText();
         }
 
-        private void UpdateNagText() {
-            if (nagCanvas == null || activated == null || nagTitle == null || nagBodyText == null || nagOpacity == null) return;
+        internal static void UpdateNagText() {
+            if (nagCanvas == null || ConfigManager.activated == null || ConfigManager.nagTitle == null || ConfigManager.nagBodyText == null || ConfigManager.nagOpacity == null) return;
 
             // Hide the nag if the OS is "activated"
-            nagCanvas.SetActive(!activated.value);
+            nagCanvas.SetActive(!ConfigManager.activated.value);
 
             var texts = nagCanvas.GetComponentsInChildren<TextMeshProUGUI>(true);
             if (texts.Length >= 2) {
-                texts[0].text = nagTitle.value;
-                texts[1].text = nagBodyText.value;
+                texts[0].text = ConfigManager.nagTitle.value;
+                texts[1].text = ConfigManager.nagBodyText.value;
             }
 
             foreach (var text in texts) {
                 Color c = text.color;
-                c.a = nagOpacity.value;
+                c.a = ConfigManager.nagOpacity.value;
                 text.color = c;
             }
         }
 
-        private void CreateText(Transform parent, string content, float fontSize, FontStyles style, Color color) {
+        private static void CreateText(Transform parent, string content, float fontSize, FontStyles style, Color color) {
             GameObject textObj = new GameObject("NagText_" + (content.Length >= 5 ? content.Substring(0, 5) : content));
             textObj.transform.SetParent(parent);
 
@@ -147,6 +142,15 @@ namespace ActivateNocturnalOS {
 
             if (ukFont != null) {
                 text.font = ukFont;
+            }
+        }
+
+        private void Update() {
+            if (lastNotification == null) lastNotification = Time.time;
+            else if ((ConfigManager.sendNotifications?.value ?? false) && Time.time - lastNotification >= ConfigManager.notificationInterval?.value) {
+                lastNotification = Time.time;
+                Notification selectedNotif = notifs[UnityEngine.Random.Range(0, notifs.Length)];
+                NotificationSystem.Notify(selectedNotif);
             }
         }
     }

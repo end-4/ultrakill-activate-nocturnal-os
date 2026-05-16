@@ -18,6 +18,7 @@ Set-StrictMode -Version Latest
 
 $root = Split-Path -Parent $MyInvocation.MyCommand.Definition
 $tmpPackageBuildDir = 'package_build'
+$pluginDir = Join-Path "$tmpPackageBuildDir" "plugins"
 $assemblyName = 'ActivateNocturnalOS.dll'
 Write-Host "Repository root: $root"
 
@@ -27,7 +28,7 @@ if (Test-Path $staging) {
     Write-Host "Removing existing staging folder: $staging"
     Remove-Item $staging -Recurse -Force
 }
-New-Item -ItemType Directory -Path $staging | Out-Null
+New-Item -ItemType Directory -Path $pluginDir | Out-Null
 
 # 2) Build the mod and copy it
 $modFolder = $root
@@ -39,7 +40,7 @@ if ($LASTEXITCODE -ne 0) {
     Pop-Location
     throw "dotnet build failed with exit code $LASTEXITCODE"
 }
-Copy-Item -Path ($assemblyPath) -Destination $staging -Recurse -Force
+Copy-Item -Path ($assemblyPath) -Destination $pluginDir -Recurse -Force
 Pop-Location
 
 # 3) Copy all files from package folder into staging
@@ -64,7 +65,7 @@ if (Test-Path $manifestPath) {
 
 # 4) Create BepInEx/plugins/assets and copy assets
 $assetsSrc = Join-Path $root 'assets'
-$assetsDest = Join-Path $staging 'BepInEx/plugins/assets'
+$assetsDest = Join-Path $staging 'plugins/assets'
 Write-Host "Creating assets destination: $assetsDest"
 New-Item -ItemType Directory -Path $assetsDest -Force | Out-Null
 if (Test-Path $assetsSrc) {
@@ -73,6 +74,9 @@ if (Test-Path $assetsSrc) {
 } else {
     Write-Warning "Assets folder not found at: $assetsSrc"
 }
+
+# 4.1) Copy main icon to plugin dir
+Copy-Item -Path (Join-Path $staging 'icon.png') -Destination (Join-Path $pluginDir 'icon.png')
 
 # 5) Create zip package
 $zipName = "$pkgName-$pkgVer.zip"

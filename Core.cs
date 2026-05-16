@@ -40,9 +40,55 @@ namespace ActivateNocturnalOS {
             },
             new Notification {
                 Summary = "Try Smilesoft365",
-                Body = "Give your productivity a boost",
+                Body = "Give your productivity a boost. Now with Coroutine.",
                 NotificationIcon = Img2Sprite.LoadNewSprite(Path.Combine(workingDir, "assets/smilesoft365.png")),
                 Actions = ["yes", "30 days free", "no", "I'll pass"],
+            },
+            new Notification {
+                Summary = "Smilesoft Incel",
+                Body = "View, filter and analyze at scale. Become a freak in the sheets.",
+                NotificationIcon = Img2Sprite.LoadNewSprite(Path.Combine(workingDir, "assets/incel.png")),
+                Actions = ["yes", "Try it"],
+            },
+            new Notification {
+                Summary = "Smilesoft Letter",
+                Body = "I like your funny words magic man",
+                NotificationIcon = Img2Sprite.LoadNewSprite(Path.Combine(workingDir, "assets/letter.png")),
+                Actions = ["yes", "Try it"],
+            },
+            new Notification {
+                Summary = "Smilesoft PowerFinger",
+                Body = "Ready to impress, when you are.",
+                NotificationIcon = Img2Sprite.LoadNewSprite(Path.Combine(workingDir, "assets/powerfinger.png")),
+                Actions = ["yes", "Try it"],
+            },
+            new Notification {
+                Summary = "Smilesoft FourNote",
+                Body = "All your notes, in four places.",
+                NotificationIcon = Img2Sprite.LoadNewSprite(Path.Combine(workingDir, "assets/fournote.png")),
+            },
+            new Notification {
+                Summary = "New message - Underlook",
+                Body = "v2@gmale.com\nFUCKING NIKKON",
+                NotificationIcon = Img2Sprite.LoadNewSprite(Path.Combine(workingDir, "assets/underlook.png")),
+            },
+            new Notification {
+                Summary = "Smilesoft Gangs",
+                Body = "Stay in the know. Turn on desktop notifications.",
+                NotificationIcon = Img2Sprite.LoadNewSprite(Path.Combine(workingDir, "assets/gangs.png")),
+                Actions = ["yes", "Turn on", "no", "Not now"],
+            },
+            new Notification {
+                Summary = "Get YBox Game Pass",
+                Body = "Play next-level games on your NocturnalOS system with YBox Game Pass.",
+                NotificationIcon = Img2Sprite.LoadNewSprite(Path.Combine(workingDir, "assets/ybox.png")),
+                Actions = ["yes", "Join now", "no", "Dismiss"],
+            },
+            new Notification {
+                Summary = "Try Smilesoft Goon",
+                Body = "Built on the same technology as Chroma, with the added trust of Smilesoft.",
+                NotificationIcon = Img2Sprite.LoadNewSprite(Path.Combine(workingDir, "assets/goon.png")),
+                Actions = ["yes", "Take me there", "no", "No thanks"],
             },
         ];
 

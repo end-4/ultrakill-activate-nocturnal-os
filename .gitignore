@@ -10,3 +10,5 @@ riderModule.iml
 *.DotSettings.user
 *.zip
 *.bak
+libs/
+*.lscache

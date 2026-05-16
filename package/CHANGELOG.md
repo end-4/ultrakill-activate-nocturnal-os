@@ -1,5 +1,9 @@
 # ActivateNocturnalOS
 
+## 1.1.1
+
+- Added more apps to the Smilesoft365 suite
+
 ## 1.1.0
 
 - Added random nag notifications

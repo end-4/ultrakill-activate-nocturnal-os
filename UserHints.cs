@@ -8,7 +8,7 @@ public static class UserHints {
 
     public static void IssueUpdateNoticeIfNecessary() {
         Version lastVersion = new Version(ConfigManager.lastVersion.value);
-        Version currVersion = new Version(Core.PluginVersion);
+        Version currVersion = new Version("1.1.0");
         if (currVersion.CompareTo(lastVersion) == 1) {
             ConfigManager.lastVersion.value = Core.PluginVersion;
             NotificationSystem.NotifySend("<color=#3a93e9>Activate Nocturnal OS</color> updated",

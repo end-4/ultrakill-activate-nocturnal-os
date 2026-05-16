@@ -1,7 +1,7 @@
 {
     "name": "ActivateNocturnalOS",
     "author": "end_4",
-    "version_number": "1.1.0",
+    "version_number": "1.1.1",
     "website_url": "https://github.com/end-4/ultrakill-activate-nocturnal-os",
     "description": "Adds a funny license nag to the bottom-right corner. Also random suggestions from Smilesoft . . .",
     "dependencies": [

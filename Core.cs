@@ -12,7 +12,7 @@ using System;
 using Notiffy.Utils;
 
 namespace ActivateNocturnalOS {
-    [BepInPlugin("com.github.end-4.activateNocturnalOS", "ActivateNocturnalOS", "1.1.0")]
+    [BepInPlugin("com.github.end-4.activateNocturnalOS", "ActivateNocturnalOS", PluginVersion)]
     public class Core : BaseUnityPlugin {
         // Logger
         internal static ManualLogSource? Log;
@@ -22,7 +22,7 @@ namespace ActivateNocturnalOS {
         public static string workingDir = Path.GetDirectoryName(workingPath);
         public const string PluginGUID = "com.github.end-4.activateNocturnalOS";
         public const string PluginName = "ActivateNocturnalOS";
-        public const string PluginVersion = "1.1.0";
+        public const string PluginVersion = "1.1.1";
 
         // Notifications
         private float? lastNotification;

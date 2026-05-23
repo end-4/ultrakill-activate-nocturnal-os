@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Notiffy.API;
+using UnityEngine.SceneManagement;
 
 namespace ActivateNocturnalOS;
 
@@ -17,9 +18,13 @@ public static class UserHints {
         }
     }
 
+    public static void IssueUpdateNoticeIfNecessary(Scene _, LoadSceneMode __) {
+        IssueUpdateNoticeIfNecessary();
+    }
+
     public static void Initialize() { }
 
     static UserHints() {
-        NotificationSystem.ReadyForScene += IssueUpdateNoticeIfNecessary;
+        SceneManager.sceneLoaded += IssueUpdateNoticeIfNecessary;
     }
 }

@@ -11,7 +11,7 @@ public class DraggableReminder : TextHudModule {
     public override string[] Tags => ["legal", "genuine", "smilesoft"];
     public override Sprite Icon => Img2Sprite.LoadNewSprite(Path.Combine(Core.workingDir, "icon.png"));
 
-    public DraggableReminder() : base("activateNocturnalOS.draggableReminder", "Nocturnal OS license reminder",
+    public DraggableReminder() : base("activateNocturnalOS.draggableReminder", "Nocturnal OS License Reminder",
         "A friendly reminder that you should activate your license") {
         CreateHeader("note", "Note", "Appearance settings are adjusted in the main Nocturnal OS License module");
         this.ForegroundColor.Hints = new InterfaceHints {

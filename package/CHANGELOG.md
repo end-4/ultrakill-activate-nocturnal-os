@@ -1,8 +1,8 @@
-# ActivateNocturnalOS
-
 ## 2.0.0
 
-- Moved config to Thorn
+- Migrated from PluginConfigurator to Thorn to allow creation of a draggable version
+- More customization: dragging, text size, and color
+- Tweaked icons to better match the ~~end_4~~ I mean Smilesoft ecosystem
 
 ## 1.1.1
 

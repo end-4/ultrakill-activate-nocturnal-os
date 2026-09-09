@@ -2,7 +2,6 @@ using PluginConfig.API;
 using PluginConfig.API.Fields;
 using PluginConfig.API.Decorators;
 using System.IO;
-using System;
 
 namespace ActivateNocturnalOS {
     public class ConfigManager {

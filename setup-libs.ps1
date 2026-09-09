@@ -3,7 +3,7 @@ param(
     [string]$UltrakillPath = "C:\Program Files (x86)\Steam\steamapps\common\ULTRAKILL",
 
     [Parameter(Mandatory=$false)]
-    [string]$R2ModmanProfilePath = "$env:APPDATA\r2modmanPlus-local\ULTRAKILL\profiles\Default"
+    [string]$R2ModmanProfilePath = "$env:APPDATA\com.kesomannen.gale\ultrakill\profiles\Default"
 )
 
 Set-StrictMode -Version Latest
@@ -56,6 +56,9 @@ $r2Dlls = @(
     "BepInEx\core\BepInEx.dll"
     "BepInEx\plugins\EternalsTeam-PluginConfigurator\PluginConfigurator\PluginConfigurator.dll"
     "BepInEx\plugins\end_4-Notiffy\Notiffy.dll"
+    "BepInEx\plugins\Notiffy\Notiffy.dll"
+    "BepInEx\plugins\end_4-Thorn\ThornClient.dll"
+    "BepInEx\plugins\Thorn\ThornClient.dll"
 )
 
 foreach ($dll in $r2Dlls) {

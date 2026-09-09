@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Notiffy.API;
+using ThornClient.System;
 using UnityEngine.SceneManagement;
 
 namespace ActivateNocturnalOS;
@@ -8,12 +9,12 @@ namespace ActivateNocturnalOS;
 public static class UserHints {
 
     public static void IssueUpdateNoticeIfNecessary() {
-        Version lastVersion = new Version(ConfigManager.lastVersion.value);
-        Version currVersion = new Version("1.1.0");
+        Version lastVersion = new Version(NocturnalLicense.LastVersion.Value);
+        Version currVersion = new Version("2.0.0");
         if (currVersion.CompareTo(lastVersion) == 1) {
-            ConfigManager.lastVersion.value = Core.PluginVersion;
-            NotificationSystem.NotifySend("<color=#3a93e9>Activate Nocturnal OS</color> updated",
-                "<b>1.1.0:</b> Introduced random funny ads. This is off by default and you can enable it manually in Plugin Config", 
+            NocturnalLicense.LastVersion.Value = Core.PluginVersion;
+            NotificationSystem.NotifySend("<color=#3a93e9>Nocturnal OS</color> notice",
+                $"Your license has expired. Go to the Thorn menu ({ThornModule.Instance!.OpenClickGUI.Value.ToString(true)}) to activate a new license.",
                 expireTime: 10000, iconFilePath: Path.Combine(Core.workingDir, "icon.png"));
         }
     }

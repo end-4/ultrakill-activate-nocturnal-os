@@ -1,5 +1,8 @@
-﻿using ThornClient.Core;
+﻿using System.IO;
+using Notiffy.Utils;
+using ThornClient.Core;
 using ThornClient.Core.ConfigurableElements;
+using UnityEngine;
 
 namespace ActivateNocturnalOS;
 
@@ -12,9 +15,11 @@ public class NocturnalLicense : Module {
     public static Setting<int> NotificationInterval;
     public static Setting<string> LastVersion;
 
+    public override Sprite Icon => Img2Sprite.LoadNewSprite(Path.Combine(Core.workingDir, "icon.png"));
+
     public NocturnalLicense() : base(
         "activateNocturnalOS.activation",
-        "NocturnalOS License",
+        "Nocturnal OS License",
         "Get a genuine license from Smilesoft.",
         ModuleCategory.Misc, hasToggling: false
     ) {
@@ -26,8 +31,14 @@ public class NocturnalLicense : Module {
         // nagOpacity = new FloatField(config.rootPanel, "Opacity", "nagOpacity", 0.35f, 0f, 1f);
         NagTitle = CreateSetting("nagTitle", "Title text", "Title text for the reminder", "Activate Nocturnal OS");
         NagBodyText = CreateSetting("nagBodyText", "Body text", "Body text for the reminder", "Go to Thorn menu to activate Nocturnal OS");
-        NagOpacity = CreateSetting("nagOpacity", "Nag opacity", "Opacity for the nag reminder", 0.35f);
+        NagOpacity = CreateSetting("nagOpacity", "Opacity", "Opacity for the reminder", 0.35f);
         NagOpacity.Hints = InterfaceHints.RangeHint();
+        CreateHeader("notifications", "Notifications", "Receive news and updates from Smilesoft");
+        SendNotifications = CreateSetting("notificationsEnabled", "Send notifications", "Whether to send random notifications", true);
+        NotificationInterval = CreateSetting("notificationInterval", "Notification interval (secs)", "Interval between notifications in seconds", 2700);
         LastVersion = CreateSetting("lastVersion", "Last version", "The last version of the application", "1.0.0");
+        LastVersion.Hints = new InterfaceHints {
+            Hidden = true
+        };
     }
 }

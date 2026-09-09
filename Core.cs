@@ -7,197 +7,126 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using Notiffy.API;
-using System;
-using Notiffy.Utils;
 
-namespace ActivateNocturnalOS {
-    [BepInPlugin("com.github.end-4.activateNocturnalOS", "ActivateNocturnalOS", PluginVersion)]
-    public class Core : BaseUnityPlugin {
-        // Logger
-        internal static ManualLogSource? Log;
+namespace ActivateNocturnalOS;
 
-        // Plugin config
-        public static string workingPath = Assembly.GetExecutingAssembly().Location;
-        public static string workingDir = Path.GetDirectoryName(workingPath);
-        public const string PluginGUID = "com.github.end-4.activateNocturnalOS";
-        public const string PluginName = "ActivateNocturnalOS";
-        public const string PluginVersion = "1.1.1";
+[BepInPlugin("com.github.end-4.activateNocturnalOS", "ActivateNocturnalOS", PluginVersion)]
+[BepInDependency("com.github.end-4.thornClient")]
+public class Core : BaseUnityPlugin {
+    // Logger
+    internal static ManualLogSource? Log;
 
-        // Notifications
-        private float? lastNotification;
-        private static Notification[] notifs = [
-            new Notification {
-                Summary = "Backup to FourDrive",
-                Body = "Keep your files safe from attacks",
-                NotificationIcon = Img2Sprite.LoadNewSprite(Path.Combine(workingDir, "assets/fourdrive.png")),
-                Actions = ["yes", "Set up", "no", "Maybe later"],
-            },
-            new Notification {
-                Summary = "Get a genuine NocturnalOS license",
-                Body = "You may be a Fraud",
-                NotificationIcon = Img2Sprite.LoadNewSprite(Path.Combine(workingDir, "icon.png")),
-            },
-            new Notification {
-                Summary = "Try Smilesoft365",
-                Body = "Give your productivity a boost. Now with Coroutine.",
-                NotificationIcon = Img2Sprite.LoadNewSprite(Path.Combine(workingDir, "assets/smilesoft365.png")),
-                Actions = ["yes", "30 days free", "no", "I'll pass"],
-            },
-            new Notification {
-                Summary = "Smilesoft Incel",
-                Body = "View, filter and analyze at scale. Become a freak in the sheets.",
-                NotificationIcon = Img2Sprite.LoadNewSprite(Path.Combine(workingDir, "assets/incel.png")),
-                Actions = ["yes", "Try it"],
-            },
-            new Notification {
-                Summary = "Smilesoft Letter",
-                Body = "I like your funny words magic man",
-                NotificationIcon = Img2Sprite.LoadNewSprite(Path.Combine(workingDir, "assets/letter.png")),
-                Actions = ["yes", "Try it"],
-            },
-            new Notification {
-                Summary = "Smilesoft PowerFinger",
-                Body = "Ready to impress, when you are.",
-                NotificationIcon = Img2Sprite.LoadNewSprite(Path.Combine(workingDir, "assets/powerfinger.png")),
-                Actions = ["yes", "Try it"],
-            },
-            new Notification {
-                Summary = "Smilesoft FourNote",
-                Body = "All your notes, in four places.",
-                NotificationIcon = Img2Sprite.LoadNewSprite(Path.Combine(workingDir, "assets/fournote.png")),
-            },
-            new Notification {
-                Summary = "New message - Underlook",
-                Body = "v2@gmale.com\nFUCKING NIKKON",
-                NotificationIcon = Img2Sprite.LoadNewSprite(Path.Combine(workingDir, "assets/underlook.png")),
-            },
-            new Notification {
-                Summary = "Smilesoft Gangs",
-                Body = "Stay in the know. Turn on desktop notifications.",
-                NotificationIcon = Img2Sprite.LoadNewSprite(Path.Combine(workingDir, "assets/gangs.png")),
-                Actions = ["yes", "Turn on", "no", "Not now"],
-            },
-            new Notification {
-                Summary = "Get YBox Game Pass",
-                Body = "Play next-level games on your NocturnalOS system with YBox Game Pass.",
-                NotificationIcon = Img2Sprite.LoadNewSprite(Path.Combine(workingDir, "assets/ybox.png")),
-                Actions = ["yes", "Join now", "no", "Dismiss"],
-            },
-            new Notification {
-                Summary = "Try Smilesoft Goon",
-                Body = "Built on the same technology as Chroma, with the added trust of Smilesoft.",
-                NotificationIcon = Img2Sprite.LoadNewSprite(Path.Combine(workingDir, "assets/goon.png")),
-                Actions = ["yes", "Take me there", "no", "No thanks"],
-            },
-        ];
+    // Meta
+    public static string workingPath = Assembly.GetExecutingAssembly().Location;
+    public static string workingDir = Path.GetDirectoryName(workingPath);
+    public const string PluginGUID = "com.github.end-4.activateNocturnalOS";
+    public const string PluginName = "ActivateNocturnalOS";
+    public const string PluginVersion = "2.0.0";
 
-        // Nag stuff
-        private static GameObject? nagCanvas;
-        private static TMP_FontAsset? ukFont;
+    // Nag stuff
+    private static GameObject? nagCanvas;
+    private static TMP_FontAsset? ukFont;
 
-        private void Awake() {
-            Log = Logger;
+    private void Awake() {
+        Log = Logger;
 
-            ConfigManager.Initialize();
-            SceneManager.sceneLoaded += OnSceneLoaded;
-            UserHints.Initialize();
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        UserHints.Initialize();
 
-            Log.LogInfo("ActivateNocturnalOS loaded!");
+        Log.LogInfo("ActivateNocturnalOS loaded!");
+    }
+
+    private static void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
+        if (ukFont == null) {
+            ukFont = Resources.FindObjectsOfTypeAll<TMP_FontAsset>()
+                .FirstOrDefault(f => f.name.Contains("VCR"));
         }
 
-        private static void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
-            if (ukFont == null) {
-                ukFont = Resources.FindObjectsOfTypeAll<TMP_FontAsset>()
-                    .FirstOrDefault(f => f.name.Contains("VCR"));
-            }
+        CreateLicenseNag();
+    }
 
-            CreateLicenseNag();
+    private static void CreateLicenseNag() {
+        if (nagCanvas != null) return;
+
+        nagCanvas = new GameObject("NocturnalOS_NagCanvas");
+        DontDestroyOnLoad(nagCanvas);
+
+        UnityEngine.Canvas canvas = nagCanvas.AddComponent<UnityEngine.Canvas>();
+        canvas.renderMode = UnityEngine.RenderMode.ScreenSpaceOverlay;
+        canvas.sortingOrder = 999;
+
+        CanvasScaler scaler = nagCanvas.AddComponent<CanvasScaler>();
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.referenceResolution = new Vector2(Screen.width, Screen.height);
+        scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
+        scaler.matchWidthOrHeight = 0.5f;
+
+        GameObject container = new GameObject("NagContainer");
+        container.transform.SetParent(nagCanvas.transform);
+
+        RectTransform rect = container.AddComponent<RectTransform>();
+        rect.anchorMin = new Vector2(1, 0);
+        rect.anchorMax = new Vector2(1, 0);
+        rect.pivot = new Vector2(1, 0);
+        rect.anchoredPosition = new Vector2(-45, 45);
+        rect.sizeDelta = new Vector2(410, 150);
+
+        VerticalLayoutGroup layout = container.AddComponent<VerticalLayoutGroup>();
+        layout.childAlignment = UnityEngine.TextAnchor.LowerLeft;
+        layout.childControlHeight = true;
+        layout.childControlWidth = true;
+        layout.childForceExpandHeight = false;
+        layout.childForceExpandWidth = false;
+        layout.spacing = 5;
+
+        CreateText(container.transform, "Activate Nocturnal OS", 28, FontStyles.Normal, new Color(1, 1, 1, 0.35f));
+        CreateText(container.transform, "Go to Settings to activate Nocturnal OS", 18, FontStyles.Normal,
+            new Color(1, 1, 1, 0.5f));
+
+        UpdateNagText();
+        NocturnalLicense.Activated.OnChanged += UpdateNagText;
+        NocturnalLicense.NagTitle.OnChanged += UpdateNagText;
+        NocturnalLicense.NagBodyText.OnChanged += UpdateNagText;
+        NocturnalLicense.NagOpacity.OnChanged += UpdateNagText;
+    }
+
+    internal static void UpdateNagText() {
+        if (nagCanvas == null) return;
+
+        // Hide the nag if the OS is "activated"
+        nagCanvas.SetActive(!NocturnalLicense.Activated.Value);
+
+        var texts = nagCanvas.GetComponentsInChildren<TextMeshProUGUI>(true);
+        if (texts.Length >= 2) {
+            texts[0].text = NocturnalLicense.NagTitle.Value;
+            texts[1].text = NocturnalLicense.NagBodyText.Value;
         }
 
-        private static void CreateLicenseNag() {
-            if (nagCanvas != null) return;
-
-            nagCanvas = new GameObject("NocturnalOS_NagCanvas");
-            DontDestroyOnLoad(nagCanvas);
-
-            UnityEngine.Canvas canvas = nagCanvas.AddComponent<UnityEngine.Canvas>();
-            canvas.renderMode = UnityEngine.RenderMode.ScreenSpaceOverlay;
-            canvas.sortingOrder = 999;
-
-            CanvasScaler scaler = nagCanvas.AddComponent<CanvasScaler>();
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = new Vector2(Screen.width, Screen.height);
-            scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
-            scaler.matchWidthOrHeight = 0.5f;
-
-            GameObject container = new GameObject("NagContainer");
-            container.transform.SetParent(nagCanvas.transform);
-
-            RectTransform rect = container.AddComponent<RectTransform>();
-            rect.anchorMin = new Vector2(1, 0);
-            rect.anchorMax = new Vector2(1, 0);
-            rect.pivot = new Vector2(1, 0);
-            rect.anchoredPosition = new Vector2(-45, 45);
-            rect.sizeDelta = new Vector2(410, 150);
-
-            VerticalLayoutGroup layout = container.AddComponent<VerticalLayoutGroup>();
-            layout.childAlignment = UnityEngine.TextAnchor.LowerLeft;
-            layout.childControlHeight = true;
-            layout.childControlWidth = true;
-            layout.childForceExpandHeight = false;
-            layout.childForceExpandWidth = false;
-            layout.spacing = 5;
-
-            CreateText(container.transform, "Activate Nocturnal OS", 28, FontStyles.Normal, new Color(1, 1, 1, 0.35f));
-            CreateText(container.transform, "Go to Settings to activate Nocturnal OS", 18, FontStyles.Normal,
-                new Color(1, 1, 1, 0.5f));
-
-            UpdateNagText();
-        }
-
-        internal static void UpdateNagText() {
-            if (nagCanvas == null || ConfigManager.activated == null || ConfigManager.nagTitle == null || ConfigManager.nagBodyText == null || ConfigManager.nagOpacity == null) return;
-
-            // Hide the nag if the OS is "activated"
-            nagCanvas.SetActive(!ConfigManager.activated.value);
-
-            var texts = nagCanvas.GetComponentsInChildren<TextMeshProUGUI>(true);
-            if (texts.Length >= 2) {
-                texts[0].text = ConfigManager.nagTitle.value;
-                texts[1].text = ConfigManager.nagBodyText.value;
-            }
-
-            foreach (var text in texts) {
-                Color c = text.color;
-                c.a = ConfigManager.nagOpacity.value;
-                text.color = c;
-            }
-        }
-
-        private static void CreateText(Transform parent, string content, float fontSize, FontStyles style, Color color) {
-            GameObject textObj = new GameObject("NagText_" + (content.Length >= 5 ? content.Substring(0, 5) : content));
-            textObj.transform.SetParent(parent);
-
-            TextMeshProUGUI text = textObj.AddComponent<TextMeshProUGUI>();
-            text.text = content;
-            text.fontSize = fontSize;
-            text.fontStyle = style;
-            text.color = color;
-            text.alignment = TextAlignmentOptions.Left;
-
-            if (ukFont != null) {
-                text.font = ukFont;
-            }
-        }
-
-        private void Update() {
-            if (lastNotification == null) lastNotification = Time.time;
-            else if ((ConfigManager.sendNotifications?.value ?? false) && Time.time - lastNotification >= ConfigManager.notificationInterval?.value) {
-                lastNotification = Time.time;
-                Notification selectedNotif = notifs[UnityEngine.Random.Range(0, notifs.Length)];
-                NotificationSystem.Notify(selectedNotif);
-            }
+        foreach (var text in texts) {
+            Color c = text.color;
+            c.a = NocturnalLicense.NagOpacity.Value;
+            text.color = c;
         }
     }
+
+    private static void CreateText(Transform parent, string content, float fontSize, FontStyles style, Color color) {
+        GameObject textObj = new GameObject("NagText_" + (content.Length >= 5 ? content.Substring(0, 5) : content));
+        textObj.transform.SetParent(parent);
+
+        TextMeshProUGUI text = textObj.AddComponent<TextMeshProUGUI>();
+        text.text = content;
+        text.fontSize = fontSize;
+        text.fontStyle = style;
+        text.color = color;
+        text.alignment = TextAlignmentOptions.Left;
+
+        if (ukFont != null) {
+            text.font = ukFont;
+        }
+    }
+
+    private void Update() {
+        RandomNotifications.OnUpdate();
+    }
 }
+

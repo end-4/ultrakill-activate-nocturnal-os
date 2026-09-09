@@ -54,11 +54,11 @@ if (-not (Test-Path $R2ModmanProfilePath)) {
 
 $r2Dlls = @(
     "BepInEx\core\BepInEx.dll"
-    "BepInEx\plugins\EternalsTeam-PluginConfigurator\PluginConfigurator\PluginConfigurator.dll"
-    "BepInEx\plugins\end_4-Notiffy\Notiffy.dll"
-    "BepInEx\plugins\Notiffy\Notiffy.dll"
+    "BepInEx\plugins\end_4-Notiffy\Notiffy\Notiffy.dll"
+    "BepInEx\plugins\Notiffy\Notiffy\Notiffy.dll"
     "BepInEx\plugins\end_4-Thorn\ThornClient.dll"
     "BepInEx\plugins\Thorn\ThornClient.dll"
+
 )
 
 foreach ($dll in $r2Dlls) {

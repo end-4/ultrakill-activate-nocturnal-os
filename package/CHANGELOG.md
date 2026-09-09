@@ -1,5 +1,9 @@
 # ActivateNocturnalOS
 
+## 2.0.0
+
+- Moved config to Thorn
+
 ## 1.1.1
 
 - Added more apps to the Smilesoft365 suite

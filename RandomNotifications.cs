@@ -76,7 +76,7 @@ public static class RandomNotifications {
             Actions = ["yes", "Join now", "no", "Dismiss"],
         },
         new Notification {
-            Summary = "Try Smilesoft Goon",
+            Summary = "Try Goon",
             Body = "Built on the same technology as Chroma, with the added trust of Smilesoft.",
             NotificationIcon = Img2Sprite.LoadNewSprite(System.IO.Path.Combine(Core.workingDir, "assets/goon.png")),
             Actions = ["yes", "Take me there", "no", "No thanks"],

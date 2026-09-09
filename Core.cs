@@ -43,6 +43,16 @@ public class Core : BaseUnityPlugin {
         }
 
         CreateLicenseNag();
+        NocturnalLicense.Activated.OnChanged += UpdateNagText;
+        NocturnalLicense.NagTitle.OnChanged += UpdateNagText;
+        NocturnalLicense.NagTitleFontSize.OnChanged += UpdateNagText;
+        NocturnalLicense.NagTitleColor.OnChanged += UpdateNagText;
+        NocturnalLicense.NagTitleColor.OnEffectiveValueChanged += UpdateNagText;
+        NocturnalLicense.NagBodyText.OnChanged += UpdateNagText;
+        NocturnalLicense.NagBodyFontSize.OnChanged += UpdateNagText;
+        NocturnalLicense.NagOpacity.OnChanged += UpdateNagText;
+        NocturnalLicense.NagBodyColor.OnChanged += UpdateNagText;
+        NocturnalLicense.NagBodyColor.OnEffectiveValueChanged += UpdateNagText;
     }
 
     private static void CreateLicenseNag() {
@@ -79,15 +89,13 @@ public class Core : BaseUnityPlugin {
         layout.childForceExpandWidth = false;
         layout.spacing = 5;
 
-        CreateText(container.transform, "Activate Nocturnal OS", 28, FontStyles.Normal, new Color(1, 1, 1, 0.35f));
-        CreateText(container.transform, "Go to Settings to activate Nocturnal OS", 18, FontStyles.Normal,
-            new Color(1, 1, 1, 0.5f));
-
+        CreateText(container.transform, "Activate Nocturnal OS", NocturnalLicense.NagTitleFontSize.Value,
+            FontStyles.Normal, NocturnalLicense.NagTitleColor.Value.GetCurrentColor());
+        CreateText(container.transform, "Go to Settings to activate Nocturnal OS",
+            NocturnalLicense.NagBodyFontSize.Value, FontStyles.Normal,
+            NocturnalLicense.NagBodyColor.Value.GetCurrentColor());
+        
         UpdateNagText();
-        NocturnalLicense.Activated.OnChanged += UpdateNagText;
-        NocturnalLicense.NagTitle.OnChanged += UpdateNagText;
-        NocturnalLicense.NagBodyText.OnChanged += UpdateNagText;
-        NocturnalLicense.NagOpacity.OnChanged += UpdateNagText;
     }
 
     internal static void UpdateNagText() {
@@ -98,8 +106,12 @@ public class Core : BaseUnityPlugin {
 
         var texts = nagCanvas.GetComponentsInChildren<TextMeshProUGUI>(true);
         if (texts.Length >= 2) {
-            texts[0].text = NocturnalLicense.NagTitle.Value;
-            texts[1].text = NocturnalLicense.NagBodyText.Value;
+            if (texts[0].text != NocturnalLicense.NagTitle.Value) texts[0].text = NocturnalLicense.NagTitle.Value;
+            if (!Mathf.Approximately(texts[0].fontSize, NocturnalLicense.NagTitleFontSize.Value)) texts[0].fontSize = NocturnalLicense.NagTitleFontSize.Value;
+            texts[0].color = NocturnalLicense.NagTitleColor.Value.GetCurrentColor();
+            if (texts[1].text != NocturnalLicense.NagBodyText.Value) texts[1].text = NocturnalLicense.NagBodyText.Value;
+            if (!Mathf.Approximately(texts[1].fontSize, NocturnalLicense.NagBodyFontSize.Value)) texts[1].fontSize = NocturnalLicense.NagBodyFontSize.Value;
+            texts[1].color = NocturnalLicense.NagBodyColor.Value.GetCurrentColor();
         }
 
         foreach (var text in texts) {
